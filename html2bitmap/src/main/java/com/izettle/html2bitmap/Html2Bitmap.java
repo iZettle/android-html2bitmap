@@ -137,7 +137,7 @@ public class Html2Bitmap {
 
 
         try {
-            return bitmapFutureTask.get(15, TimeUnit.HOURS);
+            return bitmapFutureTask.get(15, TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
             Log.e(TAG, "", e);
         }
@@ -146,7 +146,7 @@ public class Html2Bitmap {
 
     private void webContentChanged() {
         mainHandler.removeMessages(MSG_VIEW_STATE_STABLE);
-        mainHandler.sendEmptyMessageDelayed(MSG_VIEW_STATE_STABLE, 200);
+        mainHandler.sendEmptyMessageDelayed(MSG_VIEW_STATE_STABLE, 2);
     }
 
     private Bitmap screenshot(WebView webView) throws Throwable {
