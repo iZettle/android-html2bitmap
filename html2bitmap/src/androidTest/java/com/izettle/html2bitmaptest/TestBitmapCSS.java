@@ -16,9 +16,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapCSS {
@@ -42,7 +45,7 @@ public class TestBitmapCSS {
         Bitmap bitmap = Html2Bitmap.getBitmap(appContext, html, 300);
         assertNotNull(bitmap);
         assertEquals(300, bitmap.getWidth());
-        assertTrue("Height was " + bitmap.getHeight(), bitmap.getHeight() > 1850);
+        assertThat(bitmap.getHeight(), allOf(greaterThan(1870), lessThan(1920)));
     }
 
     private String stringFromStream(InputStream inputStream) throws IOException {
