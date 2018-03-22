@@ -30,9 +30,9 @@ import java.util.concurrent.TimeoutException;
 
 public class Html2Bitmap {
 
-    private static final int MSG_VIEW_STATE_STABLE = 1;
     private static final String TAG = "Html2Bitmap";
-    private final int paperWidth;
+    private static final int MSG_MEASURE = 2;
+    private static final int MSG_SCREENSHOT = 5;
     private final HandlerThread handlerThread;
     private final Handler backgroundHandler;
     private final Handler mainHandler;
@@ -42,7 +42,6 @@ public class Html2Bitmap {
 
     private Html2Bitmap(@NonNull final Context context, @NonNull String html, int paperWidth, @NonNull Callback callback) {
         this.listener = callback;
-        this.paperWidth = paperWidth;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             WebView.enableSlowWholeDocumentDraw();
@@ -62,15 +61,12 @@ public class Html2Bitmap {
         handlerThread.start();
 
         mainHandler = new Handler(Looper.getMainLooper()) {
-            boolean finished = false;
-
             @Override
             public void handleMessage(Message msg) {
-                if (finished) {
-                    Log.e(TAG, "Was already finished");
+
+                if (webView.getContentHeight() == 0) {
                     return;
                 }
-                finished = true;
 
                 // set the correct height of the webview and do measure and layout using it before taking the screenshot
                 int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(paperWidth, View.MeasureSpec.EXACTLY);
@@ -78,21 +74,23 @@ public class Html2Bitmap {
                 webView.measure(widthMeasureSpec, heightMeasureSpec);
                 webView.layout(0, 0, webView.getMeasuredWidth(), webView.getMeasuredHeight());
 
-                Message message = backgroundHandler.obtainMessage();
-                message.arg1 = webView.getContentHeight();
-                backgroundHandler.sendMessage(message);
+                backgroundHandler.removeMessages(MSG_SCREENSHOT);
+                backgroundHandler.sendEmptyMessageDelayed(MSG_SCREENSHOT, 200);
             }
         };
 
         backgroundHandler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-
+                if (webView.getMeasuredHeight() == 0) {
+                    return;
+                }
                 try {
                     Bitmap screenshot = screenshot(webView);
 
                     listener.finished(screenshot);
                 } catch (Throwable t) {
+
                     listener.error(t);
                 }
                 handlerThread.interrupt();
@@ -103,20 +101,12 @@ public class Html2Bitmap {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                // set a fixed height - it will be modified to contentHeight once done so the value does not matter
-                int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(Html2Bitmap.this.paperWidth, View.MeasureSpec.EXACTLY);
-                int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(1, View.MeasureSpec.EXACTLY);
-
-                webView.measure(widthMeasureSpec, heightMeasureSpec);
-
-                webView.layout(0, 0, webView.getMeasuredWidth(), webView.getMeasuredHeight());
-
-                webContentChanged();
+                pageFinished(50);
             }
 
             @Override
             public void onScaleChanged(WebView view, float oldScale, float newScale) {
-                webContentChanged();
+                pageFinished(50);
             }
         });
 
@@ -144,9 +134,11 @@ public class Html2Bitmap {
         return null;
     }
 
-    private void webContentChanged() {
-        mainHandler.removeMessages(MSG_VIEW_STATE_STABLE);
-        mainHandler.sendEmptyMessageDelayed(MSG_VIEW_STATE_STABLE, 2);
+    private void pageFinished(int delay) {
+
+        backgroundHandler.removeMessages(MSG_SCREENSHOT);
+        mainHandler.removeMessages(MSG_MEASURE);
+        mainHandler.sendEmptyMessageDelayed(MSG_MEASURE, delay);
     }
 
     private Bitmap screenshot(WebView webView) throws Throwable {

@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapSize {
@@ -31,7 +32,7 @@ public class TestBitmapSize {
         Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>", 300);
         assertNotNull(bitmap);
         assertEquals(300, bitmap.getWidth());
-        assertEquals(102, bitmap.getHeight());
+        assertTrue(bitmap.getHeight() > 100);
     }
 
     @Test
@@ -42,7 +43,7 @@ public class TestBitmapSize {
         Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>", 800);
         assertNotNull(bitmap);
         assertEquals(800, bitmap.getWidth());
-        assertEquals(102, bitmap.getHeight());
+        assertTrue(bitmap.getHeight() > 100);
     }
 
     @Test
@@ -57,6 +58,21 @@ public class TestBitmapSize {
         Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>", 100);
         assertNotNull(bitmap);
         assertEquals(100, bitmap.getWidth());
-        assertEquals(840, bitmap.getHeight());
+        assertTrue(bitmap.getHeight() > 800);
+    }
+
+    @Test
+    public void testExtraLongBitmap() throws Exception {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getTargetContext();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 5000; i++) {
+            sb.append("<p>i</p>");
+        }
+        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>", 100);
+        assertNotNull(bitmap);
+        assertEquals(100, bitmap.getWidth());
+        assertTrue(bitmap.getHeight() > 170000);
     }
 }
