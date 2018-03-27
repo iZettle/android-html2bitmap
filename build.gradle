@@ -16,14 +16,11 @@ buildscript {
 }
 
 plugins {
-    id "com.jfrog.artifactory" version "4.7.0"
+    id 'digital.wup.android-maven-publish' version '3.3.0'
     id "com.github.ben-manes.versions" version "0.17.0"
 }
 
 allprojects {
-    apply plugin: 'com.jfrog.artifactory'
-    apply plugin: 'maven-publish'
-
     repositories {
         google()
         jcenter()
@@ -32,40 +29,4 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-artifactoryPublish.skip = true
-
-project('html2bitmap') {
-    artifactoryPublish.dependsOn('build')
-    publishing {
-        publications {
-            aar(MavenPublication) {
-                groupId = 'com.izettle'
-                artifactId = 'html2bitmap'
-                version = CIVersionName + CIVersionNameSufix
-                // Tell maven to prepare the generated "*.aar" file for publishing
-                artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
-            }
-        }
-    }
-
-    artifactoryPublish {
-        publications(publishing.publications.aar)
-    }
-}
-
-artifactory {
-    contextUrl = 'https://devtools.izettle.net/artifactory'
-    publish {
-        repository {
-            repoKey = "${artifactory_repository}" // The Artifactory repository key to publish to
-            username = "${artifactory_user}" // The publisher user name
-            password = "${artifactory_password}" // The publisher password
-        }
-        defaults {
-            publishArtifacts = true
-            publishPom = true // Publish generated POM files to Artifactory (true by default)
-        }
-    }
 }
