@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'digital.wup.android-maven-publish'
 
 android {
     compileSdkVersion 27
@@ -17,13 +18,41 @@ android {
     }
 
     compileOptions {
-        targetCompatibility 1.8
-        sourceCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            url "https://devtools.izettle.net/artifactory/${artifactory_repository}"
+            credentials {
+                username = "${artifactory_user}" // The publisher user name
+                password = "${artifactory_password}" // The publisher password
+            }
+        }
+    }
+
+    publications {
+        aar(MavenPublication) {
+            groupId = 'com.izettle'
+            artifactId = project.name
+            version = CIVersionName + CIVersionNameSufix
+
+            from components.android
+
+            artifact sourceJar
+        }
+    }
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
 dependencies {
-    implementation 'com.android.support:appcompat-v7:27.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
