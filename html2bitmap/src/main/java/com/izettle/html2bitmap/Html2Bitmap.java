@@ -228,10 +228,13 @@ public class Html2Bitmap {
         webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "utf-8", null);
     }
 
+    @MainThread
     private void cleanup() {
         webView.stopLoading();
+
         mainHandler.removeCallbacksAndMessages(null);
         backgroundHandler.removeCallbacksAndMessages(null);
+        handlerThread.quit();
     }
 
     private void pageFinished(int delay) {
