@@ -34,7 +34,7 @@ Calls are synchronous to simplify usage in a background thread.
 new AsyncTask<Void, Void, Bitmap>() {
     @Override
     protected Bitmap doInBackground(Void... voids) {
-        String html = "<html><body><p>Hello world!</p></br>Html bitmap</body><html>";
+        String html = "<html><body><p>Hello world!</p><br/>Html bitmap</body><html>";
         return Html2Bitmap.getBitmap(context, html, 450, 15);
     }
 
