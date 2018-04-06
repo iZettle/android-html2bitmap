@@ -10,6 +10,12 @@ Height will be calculated using WebView.getContentHeight()
 
 ### Usage: 
 ```
+dependencies {
+    implementation 'com.izettle:html2bitmap:1.3'
+}
+```
+
+```
 Bitmap bitmap = Html2Bitmap.getBitmap(context: Context, html: String, width: Int);
 
 Bitmap bitmap = Html2Bitmap.getBitmap(context: Context, html: String, width: Int, timeOut: Int);
