@@ -59,7 +59,7 @@ public class Html2Bitmap {
     private WebView webView;
 
     @AnyThread
-    private Html2Bitmap(@NonNull final Context context, @NonNull String html, int paperWidth, @NonNull Callback callback) {
+    private Html2Bitmap(@NonNull final Context context, @NonNull String html, final int paperWidth, @NonNull final Callback callback) {
         this.context = context;
         this.html = html;
         this.paperWidth = paperWidth;
@@ -128,17 +128,27 @@ public class Html2Bitmap {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(bitmapFutureTask);
 
-        Html2Bitmap html2Bitmap = new Html2Bitmap(context, html, width, bitmapCallable);
+        final Html2Bitmap html2Bitmap = new Html2Bitmap(context, html, width, bitmapCallable);
 
         Handler mainHandler = new Handler(context.getMainLooper());
-        mainHandler.post(html2Bitmap::load);
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                html2Bitmap.load();
+            }
+        });
 
         try {
             return bitmapFutureTask.get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
             Log.e(TAG, "", e);
         } finally {
-            mainHandler.post(html2Bitmap::cleanup);
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    html2Bitmap.cleanup();
+                }
+            });
         }
         return null;
     }
