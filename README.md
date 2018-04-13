@@ -55,3 +55,6 @@ new AsyncTask<Void, Void, Bitmap>() {
 
 Note: Some of the methods on the webview are required to be run on the mainThread 
 of the application - so some operations will be performed on that thread.
+
+
+![screenshot_1523608598](https://user-images.githubusercontent.com/373219/38725783-b3a9f364-3f08-11e8-8820-c8ecc7abe7ae.png)
