@@ -116,12 +116,12 @@ public class Html2Bitmap {
     }
 
     @Nullable
-    public static Bitmap getBitmap(Context context, String html, int width) {
+    public static Bitmap getBitmap(@NonNull Context context, @NonNull String html, int width) {
         return getBitmap(context, html, width, 15);
     }
 
     @Nullable
-    public static Bitmap getBitmap(Context context, String html, int width, int timeout) {
+    public static Bitmap getBitmap(@NonNull Context context, @NonNull String html, int width, int timeout) {
         Html2Bitmap.BitmapCallable bitmapCallable = new Html2Bitmap.BitmapCallable();
         FutureTask<Bitmap> bitmapFutureTask = new FutureTask<>(bitmapCallable);
 
