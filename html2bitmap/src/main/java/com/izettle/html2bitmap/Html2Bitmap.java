@@ -87,7 +87,7 @@ public class Html2Bitmap {
             }
         };
 
-        handlerThread = new HandlerThread("HandlerThread");
+        handlerThread = new HandlerThread("Html2BitmapHandlerThread");
         handlerThread.start();
 
         backgroundHandler = new Handler(handlerThread.getLooper()) {
