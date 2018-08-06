@@ -26,7 +26,15 @@ class BitmapGeneratingAsyncTask extends AsyncTask<Void, Void, Bitmap> {
     protected Bitmap doInBackground(Void... voids) {
         Context context = this.context.get();
 
-        return Html2Bitmap.getBitmap(context, html, width, 15);
+        Html2Bitmap html2Bitmap = new Html2Bitmap.Builder()
+                .setContext(context)
+                .setHtml(html)
+                .setBitmapWidth(width)
+                .setDelayMeasure(10)
+                .setDelayScreenShot(10)
+                .setStrictMode(true)
+                .build();
+        return Html2Bitmap.getBitmap(html2Bitmap, 15);
     }
 
     @Override
