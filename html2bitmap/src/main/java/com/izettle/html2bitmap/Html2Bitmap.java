@@ -24,14 +24,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,12 +50,12 @@ public class Html2Bitmap {
     private final String html;
     private final int paperWidth;
     private final Context context;
+    int resourcesLoaded = 0;
     private int resourcesLoading = 0;
-    private int resourcesLoaded = 0;
     private WebView webView;
 
     @AnyThread
-    private Html2Bitmap(@NonNull final Context context, @NonNull String html, final int paperWidth, @NonNull final Callback callback) {
+    private Html2Bitmap(@NonNull final Context context, @NonNull String html, final int paperWidth, @NonNull final BitmapCallback callback) {
         this.context = context;
         this.html = html;
         this.paperWidth = paperWidth;
@@ -122,7 +118,7 @@ public class Html2Bitmap {
 
     @Nullable
     public static Bitmap getBitmap(@NonNull Context context, @NonNull String html, int width, int timeout) {
-        Html2Bitmap.BitmapCallable bitmapCallable = new Html2Bitmap.BitmapCallable();
+        BitmapCallable bitmapCallable = new BitmapCallable();
         FutureTask<Bitmap> bitmapFutureTask = new FutureTask<>(bitmapCallable);
 
         ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -214,12 +210,16 @@ public class Html2Bitmap {
                     resourcesLoading++;
                     try {
                         URLConnection urlConnection = url.openConnection();
-                        InputStream in = new InputStreamWrapper(urlConnection.getInputStream());
+                        InputStream in = new InputStreamWrapper(new InputStreamWrapper.Callback() {
+                            @Override
+                            public void onClose() {
+                                resourcesLoaded++;
+                            }
+                        }, urlConnection.getInputStream());
                         return new WebResourceResponse(urlConnection.getContentType(), urlConnection.getContentEncoding(), in);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         resourcesLoaded++;
-                        return null;
                     }
 
                 }
@@ -262,51 +262,5 @@ public class Html2Bitmap {
 
         webView.draw(canvas);
         return bitmap;
-    }
-
-    private interface Callback {
-        void finished(Bitmap bitmap);
-
-        void error(Throwable error);
-    }
-
-    private static class BitmapCallable implements Callable<Bitmap>, Callback {
-
-        CountDownLatch latch = new CountDownLatch(1);
-        private Bitmap bitmap;
-
-        private BitmapCallable() {
-        }
-
-        @Override
-        public Bitmap call() throws Exception {
-            latch.await();
-            return bitmap;
-        }
-
-        @Override
-        public void finished(Bitmap bitmap) {
-            this.bitmap = bitmap;
-            latch.countDown();
-        }
-
-        @Override
-        public void error(Throwable error) {
-            Log.e(TAG, "", error);
-            latch.countDown();
-        }
-    }
-
-    private class InputStreamWrapper extends BufferedInputStream {
-
-        private InputStreamWrapper(@NonNull InputStream in) {
-            super(in);
-        }
-
-        @Override
-        public void close() throws IOException {
-            super.close();
-            resourcesLoaded++;
-        }
     }
 }
