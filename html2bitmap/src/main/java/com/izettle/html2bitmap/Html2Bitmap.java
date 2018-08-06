@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -24,8 +25,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Html2Bitmap {
@@ -41,6 +44,7 @@ public class Html2Bitmap {
     private static final String TAG = "Html2Bitmap";
     private static final int MSG_MEASURE = 2;
     private static final int MSG_SCREENSHOT = 5;
+    private static final String HTML2BITMAP_PROTOCOL = "html2bitmap";
     private final HandlerThread handlerThread;
     private final Handler backgroundHandler;
     private final Handler mainHandler;
@@ -50,9 +54,8 @@ public class Html2Bitmap {
     private final String html;
     private final int paperWidth;
     private final Context context;
-    int resourcesLoaded = 0;
-    private int resourcesLoading = 0;
     private WebView webView;
+    private AtomicInteger work = new AtomicInteger(0);
 
     @AnyThread
     private Html2Bitmap(@NonNull final Context context, @NonNull String html, final int paperWidth, @NonNull final BitmapCallback callback) {
@@ -63,7 +66,7 @@ public class Html2Bitmap {
         mainHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (resourcesLoading > resourcesLoaded) {
+                if (work.get() > 0) {
                     Log.d(TAG, "waiting for resources...");
                     return;
                 }
@@ -90,7 +93,7 @@ public class Html2Bitmap {
         backgroundHandler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (resourcesLoading > resourcesLoaded) {
+                if (work.get() > 0) {
                     return;
                 }
 
@@ -166,10 +169,11 @@ public class Html2Bitmap {
         settings.setSupportZoom(false);
 
         webView.setWebChromeClient(new WebChromeClient() {
+
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                if (newProgress == 100 && resourcesLoading == resourcesLoaded) {
+                if (newProgress == 100 && work.get() == 0) {
                     pageFinished(delayMeasure);
                 }
             }
@@ -177,13 +181,26 @@ public class Html2Bitmap {
 
         webView.setWebViewClient(new WebViewClient() {
 
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+            }
+
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                work.incrementAndGet();
+
+                Uri parse = Uri.parse(url);
                 try {
-                    URL resourceUrl = new URL(url);
-                    return getResponse(resourceUrl);
-                } catch (MalformedURLException ignored) {
+                    String protocol = parse.getScheme();
+                    if (protocol.equals("http") || protocol.equals("https")) {
+                        return getRemoteFile(parse);
+                    } else if (protocol.equals(HTML2BITMAP_PROTOCOL)) {
+                        return getLocalFile(parse);
+                    }
+                } finally {
+                    work.decrementAndGet();
                 }
 
                 return super.shouldInterceptRequest(view, url);
@@ -193,37 +210,70 @@ public class Html2Bitmap {
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                work.incrementAndGet();
+
                 try {
-                    URL resourceUrl = new URL(request.getUrl().toString());
-                    return getResponse(resourceUrl);
-                } catch (MalformedURLException ignored) {
+                    String protocol = request.getUrl().getScheme();
+                    if (protocol.equals("http") || protocol.equals("https")) {
+                        return getRemoteFile(request.getUrl());
+                    } else if (protocol.equals(HTML2BITMAP_PROTOCOL)) {
+                        return getLocalFile(request.getUrl());
+                    }
+                } finally {
+                    work.decrementAndGet();
                 }
 
                 return super.shouldInterceptRequest(view, request);
             }
 
-            WebResourceResponse getResponse(URL url) {
+            private WebResourceResponse getLocalFile(Uri uri) {
+                if (uri.getScheme().equals(HTML2BITMAP_PROTOCOL)) {
+                    work.incrementAndGet();
 
-                String protocol = url.getProtocol();
+                    try {
+                        String mimeType = context.getContentResolver().getType(uri);
+
+                        InputStreamReader open = new InputStreamReader(context.getAssets().open(uri.getLastPathSegment()));
+                        String encoding = open.getEncoding();
+                        open.close();
+
+                        InputStream in = new InputStreamWrapper(new InputStreamWrapper.Callback() {
+                            @Override
+                            public void onClose() {
+                                work.decrementAndGet();
+                            }
+                        }, context.getAssets().open(uri.getLastPathSegment()));
+                        return new WebResourceResponse(mimeType, encoding, in);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        work.decrementAndGet();
+                    }
+                }
+
+                return null;
+            }
+
+            private WebResourceResponse getRemoteFile(Uri uri) {
+                String protocol = uri.getScheme();
                 if (protocol.equals("http") || protocol.equals("https")) {
 
-                    resourcesLoading++;
+                    work.incrementAndGet();
                     try {
+                        URL url = new URL(uri.toString());
                         URLConnection urlConnection = url.openConnection();
                         InputStream in = new InputStreamWrapper(new InputStreamWrapper.Callback() {
                             @Override
                             public void onClose() {
-                                resourcesLoaded++;
+                                work.decrementAndGet();
                             }
                         }, urlConnection.getInputStream());
                         return new WebResourceResponse(urlConnection.getContentType(), urlConnection.getContentEncoding(), in);
                     } catch (Exception e) {
                         e.printStackTrace();
-                        resourcesLoaded++;
+                        work.decrementAndGet();
                     }
 
                 }
-
                 return null;
             }
         });
@@ -234,7 +284,7 @@ public class Html2Bitmap {
         webView.measure(widthMeasureSpec, heightMeasureSpec);
         webView.layout(0, 0, webView.getMeasuredWidth(), webView.getMeasuredHeight());
 
-        webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "utf-8", null);
+        webView.loadDataWithBaseURL(HTML2BITMAP_PROTOCOL + "://android_asset/", html, "text/html", "utf-8", null);
     }
 
     @MainThread

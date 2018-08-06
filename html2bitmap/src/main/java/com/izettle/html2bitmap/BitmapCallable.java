@@ -7,7 +7,7 @@ import java.util.concurrent.CountDownLatch;
 
 class BitmapCallable implements Callable<Bitmap>, BitmapCallback {
 
-    CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch latch = new CountDownLatch(1);
     private Bitmap bitmap;
 
     BitmapCallable() {
