@@ -5,7 +5,9 @@
 <![CDATA[
 <html>\n
 \t    <body>\n
+
 \t\t        <p>Hello world!</p><br/>\n
+\t\t        <img src="rainbow_200_200.png" /><br/>\n
 \t\t        Html bitmap\n
 \t    </body>\n
 <html>\n

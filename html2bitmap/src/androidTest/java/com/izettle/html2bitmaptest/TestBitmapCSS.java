@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapCSS {
     @Test
-    public void useAppContext() throws Exception {
+    public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
@@ -42,7 +42,7 @@ public class TestBitmapCSS {
 
         String html = stringFromStream(inputStream);
 
-        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, html, 300);
+        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, html, 300, 300);
         assertNotNull(bitmap);
         assertEquals(300, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(1870), lessThan(1920)));
