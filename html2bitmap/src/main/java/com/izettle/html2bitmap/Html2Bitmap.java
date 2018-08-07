@@ -24,33 +24,20 @@ public class Html2Bitmap {
     private final int delayMeasure;
     private final int delayScreenShot;
     private boolean strictMode;
+    private long timeout;
 
-    private Html2Bitmap(Context context, String html, int bitmapWidth, int delayMeasure, int delayScreenShot, boolean strictMode) {
+    private Html2Bitmap(Context context, String html, int bitmapWidth, int delayMeasure, int delayScreenShot, boolean strictMode, long timeout) {
         this.context = context;
         this.html = html;
         this.bitmapWidth = bitmapWidth;
         this.delayMeasure = delayMeasure;
         this.delayScreenShot = delayScreenShot;
         this.strictMode = strictMode;
+        this.timeout = timeout;
     }
 
     @Nullable
-    public static Bitmap getBitmap(@NonNull Context context, @NonNull String html, int bitmapWidth) {
-        return getBitmap(new Builder().setContext(context).setHtml(html).setBitmapWidth(bitmapWidth).build());
-    }
-
-    @Nullable
-    public static Bitmap getBitmap(@NonNull Context context, @NonNull String html, int bitmapWidth, int timeout) {
-        return getBitmap(new Builder().setContext(context).setHtml(html).setBitmapWidth(bitmapWidth).build(), timeout);
-    }
-
-    @Nullable
-    public static Bitmap getBitmap(final Html2Bitmap html2Bitmap) {
-        return getBitmap(html2Bitmap, 15);
-    }
-
-    @Nullable
-    public static Bitmap getBitmap(final Html2Bitmap html2Bitmap, int timeout) {
+    private static Bitmap getBitmap(final Html2Bitmap html2Bitmap) {
         final BitmapCallable bitmapCallable = new BitmapCallable();
         FutureTask<Bitmap> bitmapFutureTask = new FutureTask<>(bitmapCallable);
 
@@ -68,7 +55,7 @@ public class Html2Bitmap {
         });
 
         try {
-            return bitmapFutureTask.get(timeout, TimeUnit.SECONDS);
+            return bitmapFutureTask.get(html2Bitmap.timeout, TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
             Log.e(TAG, "", e);
         } finally {
@@ -82,6 +69,10 @@ public class Html2Bitmap {
         return null;
     }
 
+    public Bitmap getBitmap() {
+        return getBitmap(this);
+    }
+
     public static class Builder {
         private Context context;
         private String html;
@@ -89,9 +80,15 @@ public class Html2Bitmap {
         private int delayMeasure = 30;
         private int delayScreenShot = 30;
         private boolean strictMode = false;
+        private long timeout = 15;
 
         public Builder() {
 
+        }
+
+        public Builder(@NonNull Context context, @NonNull String html) {
+            setContext(context);
+            setHtml(html);
         }
 
         public Builder setContext(@NonNull Context context) {
@@ -124,6 +121,11 @@ public class Html2Bitmap {
             return this;
         }
 
+        public Builder setTimeout(long timeout) {
+            this.timeout = timeout;
+            return this;
+        }
+
         public Html2Bitmap build() {
             if (context == null) {
                 throw new NullPointerException();
@@ -131,7 +133,7 @@ public class Html2Bitmap {
             if (html == null) {
                 throw new NullPointerException();
             }
-            return new Html2Bitmap(context, html, bitmapWidth, delayMeasure, delayScreenShot, strictMode);
+            return new Html2Bitmap(context, html, bitmapWidth, delayMeasure, delayScreenShot, strictMode, timeout);
         }
     }
 }
