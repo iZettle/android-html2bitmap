@@ -77,8 +77,8 @@ public class Html2Bitmap {
         private Context context;
         private String html;
         private int bitmapWidth = 480;
-        private int delayMeasure = 30;
-        private int delayScreenShot = 30;
+        private int delayMeasure = 300;
+        private int delayScreenShot = 300;
         private boolean strictMode = false;
         private long timeout = 15;
 
