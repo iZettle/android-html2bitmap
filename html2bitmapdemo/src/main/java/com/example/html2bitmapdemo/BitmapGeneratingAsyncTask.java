@@ -33,7 +33,7 @@ class BitmapGeneratingAsyncTask extends AsyncTask<Void, Void, Bitmap> {
                 .setDelayMeasure(10)
                 .setDelayScreenShot(10)
                 .setStrictMode(true)
-                .setTimeout(15)
+                .setTimeout(5)
                 .build()
                 .getBitmap();
 

@@ -48,7 +48,6 @@ class Html2BitmapWebView {
     private BitmapCallback callback;
     private WebView webView;
     private AtomicInteger work = new AtomicInteger(0);
-    private boolean isRunning;
 
     @AnyThread
     Html2BitmapWebView(@NonNull final Context context, @NonNull String html, final int bitmapWidth, final int delayMeasure, final int delayScreenShot, final boolean strictMode) {
@@ -60,7 +59,7 @@ class Html2BitmapWebView {
         mainHandler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (!isRunning) {
+                if (handlerThread.isInterrupted()) {
                     if (strictMode) {
                         throw new IllegalStateException();
                     }
@@ -105,13 +104,11 @@ class Html2BitmapWebView {
                 }
                 try {
                     Bitmap screenshot = screenshot(webView);
-
                     callback.finished(screenshot);
                 } catch (Throwable t) {
 
                     callback.error(t);
                 }
-                handlerThread.interrupt();
             }
         };
     }
@@ -120,7 +117,6 @@ class Html2BitmapWebView {
     @MainThread
     void load(@NonNull final BitmapCallback callback) {
         this.callback = callback;
-        isRunning = true;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             WebView.enableSlowWholeDocumentDraw();
@@ -253,12 +249,11 @@ class Html2BitmapWebView {
     @MainThread
     void cleanup() {
         webView.stopLoading();
-
         mainHandler.removeCallbacksAndMessages(null);
         backgroundHandler.removeCallbacksAndMessages(null);
+        handlerThread.interrupt();
         handlerThread.quit();
 
-        isRunning = false;
     }
 
     private void pageFinished(int delay) {
