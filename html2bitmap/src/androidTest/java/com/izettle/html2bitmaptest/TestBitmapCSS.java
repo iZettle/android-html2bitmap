@@ -42,7 +42,7 @@ public class TestBitmapCSS {
 
         String html = stringFromStream(inputStream);
 
-        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, html, 300, 300);
+        Bitmap bitmap = new Html2Bitmap.Builder(appContext, html).setBitmapWidth(300).setTimeout(300).build().getBitmap();
         assertNotNull(bitmap);
         assertEquals(300, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(1870), lessThan(1920)));

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapSize {
     @Test
-    public void useAppContext() throws Exception {
+    public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
@@ -28,29 +28,29 @@ public class TestBitmapSize {
     }
 
     @Test
-    public void testBitmap() throws Exception {
+    public void testBitmap() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>", 300);
+        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setHtml("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>").setBitmapWidth(300).setTimeout(300).build().getBitmap();
         assertNotNull(bitmap);
         assertEquals(300, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(100), lessThan(110)));
     }
 
     @Test
-    public void testWideBitmap() throws Exception {
+    public void testWideBitmap() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>", 800);
+        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setHtml("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>").setBitmapWidth(800).setTimeout(300).build().getBitmap();
         assertNotNull(bitmap);
         assertEquals(800, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(100), lessThan(110)));
     }
 
     @Test
-    public void testLongBitmap() throws Exception {
+    public void testLongBitmap() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
@@ -58,14 +58,15 @@ public class TestBitmapSize {
         for (int i = 0; i < 20; i++) {
             sb.append("<p>i</p>");
         }
-        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>", 100);
+        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setHtml("<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>").setBitmapWidth(100).setTimeout(300).build().getBitmap();
+
         assertNotNull(bitmap);
         assertEquals(100, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(830), lessThan(890)));
     }
 
     @Test
-    public void testExtraLongBitmap() throws Exception {
+    public void testExtraLongBitmap() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
@@ -73,7 +74,9 @@ public class TestBitmapSize {
         for (int i = 0; i < 500; i++) {
             sb.append("<p>i</p>");
         }
-        Bitmap bitmap = Html2Bitmap.getBitmap(appContext, "<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>", 100);
+
+        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setHtml("<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>").setBitmapWidth(100).setTimeout(300).build().getBitmap();
+
         assertNotNull(bitmap);
         assertEquals(100, bitmap.getWidth());
 
