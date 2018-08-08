@@ -11,14 +11,12 @@ Height will be calculated using WebView.getContentHeight()
 ### Usage: 
 ```
 dependencies {
-    implementation 'com.izettle:html2bitmap:1.5'
+    implementation 'com.izettle:html2bitmap:1.6'
 }
 ```
 
 ```
-Bitmap bitmap = new Html2Bitmap.Builder(context: Context, html: String).setBitmapWidth(width: Int).build().getBitmap();
-
-Bitmap bitmap = new Html2Bitmap.Builder(context: Context, html: String).setBitmapWidth(width: Int).setTimeOut(timeout: Long).build().getBitmap();
+Bitmap bitmap = new Html2Bitmap.Builder(context: Context, content: WebViewContent).build().getBitmap();
 ```
 
 - **context** Used to create webview - application context is fine.
@@ -42,7 +40,7 @@ new AsyncTask<Void, Void, Bitmap>() {
     protected Bitmap doInBackground(Void... voids) {
         String html = "<html><body><p>Hello world!</p><br/>Html bitmap</body><html>";
         
-        return new Html2Bitmap.Builder().setContext(context).setHtml(html).build().getBitmap();   
+        return new Html2Bitmap.Builder().setContext(context).setContent(WebViewContent.html(html)).build().getBitmap();   
     }
 
     @Override
