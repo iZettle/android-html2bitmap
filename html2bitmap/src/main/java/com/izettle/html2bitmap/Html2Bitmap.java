@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.izettle.html2bitmap.content.WebViewContent;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,19 +21,19 @@ public class Html2Bitmap {
 
     private static final String TAG = "Html2Bitmap";
     private final Context context;
-    private final String html;
+    private final WebViewContent content;
     private final int bitmapWidth;
-    private final int delayMeasure;
-    private final int delayScreenShot;
+    private final int measureDelay;
+    private final int screenshotDelay;
     private boolean strictMode;
     private long timeout;
 
-    private Html2Bitmap(Context context, String html, int bitmapWidth, int delayMeasure, int delayScreenShot, boolean strictMode, long timeout) {
+    private Html2Bitmap(Context context, WebViewContent content, int bitmapWidth, int measureDelay, int screenshotDelay, boolean strictMode, long timeout) {
         this.context = context;
-        this.html = html;
+        this.content = content;
         this.bitmapWidth = bitmapWidth;
-        this.delayMeasure = delayMeasure;
-        this.delayScreenShot = delayScreenShot;
+        this.measureDelay = measureDelay;
+        this.screenshotDelay = screenshotDelay;
         this.strictMode = strictMode;
         this.timeout = timeout;
     }
@@ -46,7 +48,7 @@ public class Html2Bitmap {
 
         Handler mainHandler = new Handler(html2Bitmap.context.getMainLooper());
 
-        final Html2BitmapWebView html2BitmapWebView = new Html2BitmapWebView(html2Bitmap.context, html2Bitmap.html, html2Bitmap.bitmapWidth, html2Bitmap.delayMeasure, html2Bitmap.delayScreenShot, html2Bitmap.strictMode);
+        final Html2BitmapWebView html2BitmapWebView = new Html2BitmapWebView(html2Bitmap.context, html2Bitmap.content, html2Bitmap.bitmapWidth, html2Bitmap.measureDelay, html2Bitmap.screenshotDelay, html2Bitmap.strictMode);
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -75,20 +77,20 @@ public class Html2Bitmap {
 
     public static class Builder {
         private Context context;
-        private String html;
         private int bitmapWidth = 480;
-        private int delayMeasure = 300;
-        private int delayScreenShot = 300;
+        private int measureDelay = 300;
+        private int screenshotDelay = 300;
         private boolean strictMode = false;
         private long timeout = 15;
+        private WebViewContent content;
 
         public Builder() {
 
         }
 
-        public Builder(@NonNull Context context, @NonNull String html) {
+        public Builder(@NonNull Context context, @NonNull WebViewContent content) {
             setContext(context);
-            setHtml(html);
+            setContent(content);
         }
 
         public Builder setContext(@NonNull Context context) {
@@ -96,8 +98,8 @@ public class Html2Bitmap {
             return this;
         }
 
-        public Builder setHtml(@NonNull String html) {
-            this.html = html;
+        public Builder setContent(@NonNull WebViewContent content) {
+            this.content = content;
             return this;
         }
 
@@ -106,13 +108,13 @@ public class Html2Bitmap {
             return this;
         }
 
-        public Builder setDelayMeasure(int delayMeasure) {
-            this.delayMeasure = delayMeasure;
+        public Builder setMeasureDelay(int measureDelay) {
+            this.measureDelay = measureDelay;
             return this;
         }
 
-        public Builder setDelayScreenShot(int delayScreenShot) {
-            this.delayScreenShot = delayScreenShot;
+        public Builder setScreenshotDelay(int screenshotDelay) {
+            this.screenshotDelay = screenshotDelay;
             return this;
         }
 
@@ -130,10 +132,10 @@ public class Html2Bitmap {
             if (context == null) {
                 throw new NullPointerException();
             }
-            if (html == null) {
+            if (content == null) {
                 throw new NullPointerException();
             }
-            return new Html2Bitmap(context, html, bitmapWidth, delayMeasure, delayScreenShot, strictMode, timeout);
+            return new Html2Bitmap(context, content, bitmapWidth, measureDelay, screenshotDelay, strictMode, timeout);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.izettle.html2bitmap;
+package com.izettle.html2bitmap.content;
 
 import android.support.annotation.NonNull;
 
