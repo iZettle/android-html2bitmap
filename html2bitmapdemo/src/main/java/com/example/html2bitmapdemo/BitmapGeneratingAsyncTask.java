@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 
 import com.izettle.html2bitmap.Html2Bitmap;
+import com.izettle.html2bitmap.content.WebViewContent;
 
 import java.lang.ref.WeakReference;
 
@@ -28,10 +29,10 @@ class BitmapGeneratingAsyncTask extends AsyncTask<Void, Void, Bitmap> {
 
         return new Html2Bitmap.Builder()
                 .setContext(context)
-                .setHtml(html)
+                .setContent(WebViewContent.html(html))
                 .setBitmapWidth(width)
-                .setDelayMeasure(10)
-                .setDelayScreenShot(10)
+                .setMeasureDelay(10)
+                .setScreenshotDelay(10)
                 .setStrictMode(true)
                 .setTimeout(5)
                 .build()

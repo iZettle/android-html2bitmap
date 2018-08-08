@@ -25,36 +25,30 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.izettle.html2bitmap.content.WebViewContent;
 
 class Html2BitmapWebView {
     private static final String TAG = "Html2Bitmap";
     private static final int MSG_MEASURE = 2;
     private static final int MSG_SCREENSHOT = 5;
-    private static final String HTML2BITMAP_PROTOCOL = "html2bitmap";
     private final HandlerThread handlerThread;
     private final Handler backgroundHandler;
     private final Handler mainHandler;
 
-    private final int delayMeasure;
-    private final String html;
+    private final int measureDelay;
+    private final WebViewContent content;
     private final int bitmapWidth;
     private final Context context;
     private BitmapCallback callback;
     private WebView webView;
-    private AtomicInteger work = new AtomicInteger(0);
+
 
     @AnyThread
-    Html2BitmapWebView(@NonNull final Context context, @NonNull String html, final int bitmapWidth, final int delayMeasure, final int delayScreenShot, final boolean strictMode) {
+    Html2BitmapWebView(@NonNull final Context context, @NonNull final WebViewContent content, final int bitmapWidth, final int measureDelay, final int screenshotDelay, final boolean strictMode) {
         this.context = context;
-        this.html = html;
+        this.content = content;
         this.bitmapWidth = bitmapWidth;
-        this.delayMeasure = delayMeasure;
+        this.measureDelay = measureDelay;
 
         mainHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -68,12 +62,12 @@ class Html2BitmapWebView {
                     return;
                 }
 
-                if (work.get() > 0) {
+                if (!content.done()) {
                     return;
                 }
 
                 if (webView.getContentHeight() == 0) {
-                    pageFinished(delayMeasure);
+                    pageFinished(measureDelay);
                     return;
                 }
 
@@ -84,7 +78,7 @@ class Html2BitmapWebView {
                 webView.layout(0, 0, webView.getMeasuredWidth(), webView.getMeasuredHeight());
 
                 backgroundHandler.removeMessages(MSG_SCREENSHOT);
-                backgroundHandler.sendEmptyMessageDelayed(MSG_SCREENSHOT, delayScreenShot);
+                backgroundHandler.sendEmptyMessageDelayed(MSG_SCREENSHOT, screenshotDelay);
             }
         };
 
@@ -94,12 +88,12 @@ class Html2BitmapWebView {
         backgroundHandler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (work.get() > 0) {
+                if (!content.done()) {
                     return;
                 }
 
                 if (webView.getMeasuredHeight() == 0) {
-                    pageFinished(delayMeasure);
+                    pageFinished(measureDelay);
                     return;
                 }
                 try {
@@ -137,8 +131,8 @@ class Html2BitmapWebView {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                if (newProgress == 100 && work.get() == 0) {
-                    pageFinished(delayMeasure);
+                if (newProgress == 100 && content.done()) {
+                    pageFinished(measureDelay);
                 }
             }
         });
@@ -148,92 +142,16 @@ class Html2BitmapWebView {
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                work.incrementAndGet();
-
-                Uri parse = Uri.parse(url);
-                try {
-                    String protocol = parse.getScheme();
-                    if (protocol.equals("http") || protocol.equals("https")) {
-                        return getRemoteFile(parse);
-                    } else if (protocol.equals(HTML2BITMAP_PROTOCOL)) {
-                        return getLocalFile(parse);
-                    }
-                } finally {
-                    work.decrementAndGet();
-                }
-
-                return super.shouldInterceptRequest(view, url);
+                WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), Uri.parse(url));
+                return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, url);
             }
 
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                work.incrementAndGet();
-
-                try {
-                    String protocol = request.getUrl().getScheme();
-                    if (protocol.equals("http") || protocol.equals("https")) {
-                        return getRemoteFile(request.getUrl());
-                    } else if (protocol.equals(HTML2BITMAP_PROTOCOL)) {
-                        return getLocalFile(request.getUrl());
-                    }
-                } finally {
-                    work.decrementAndGet();
-                }
-
-                return super.shouldInterceptRequest(view, request);
-            }
-
-            private WebResourceResponse getLocalFile(Uri uri) {
-                if (uri.getScheme().equals(HTML2BITMAP_PROTOCOL)) {
-                    work.incrementAndGet();
-
-                    try {
-                        String mimeType = context.getContentResolver().getType(uri);
-
-                        InputStreamReader open = new InputStreamReader(context.getAssets().open(uri.getLastPathSegment()));
-                        String encoding = open.getEncoding();
-                        open.close();
-
-                        InputStream in = new InputStreamWrapper(new InputStreamWrapper.Callback() {
-                            @Override
-                            public void onClose() {
-                                work.decrementAndGet();
-                            }
-                        }, context.getAssets().open(uri.getLastPathSegment()));
-                        return new WebResourceResponse(mimeType, encoding, in);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        work.decrementAndGet();
-                    }
-                }
-
-                return null;
-            }
-
-            private WebResourceResponse getRemoteFile(Uri uri) {
-                String protocol = uri.getScheme();
-                if (protocol.equals("http") || protocol.equals("https")) {
-
-                    work.incrementAndGet();
-                    try {
-                        URL url = new URL(uri.toString());
-                        URLConnection urlConnection = url.openConnection();
-                        InputStream in = new InputStreamWrapper(new InputStreamWrapper.Callback() {
-                            @Override
-                            public void onClose() {
-                                work.decrementAndGet();
-                            }
-                        }, urlConnection.getInputStream());
-                        return new WebResourceResponse(urlConnection.getContentType(), urlConnection.getContentEncoding(), in);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        work.decrementAndGet();
-                    }
-
-                }
-                return null;
+                WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), request.getUrl());
+                return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, request);
             }
         });
 
@@ -242,8 +160,7 @@ class Html2BitmapWebView {
         int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(10, View.MeasureSpec.EXACTLY);
         webView.measure(widthMeasureSpec, heightMeasureSpec);
         webView.layout(0, 0, webView.getMeasuredWidth(), webView.getMeasuredHeight());
-
-        webView.loadDataWithBaseURL(HTML2BITMAP_PROTOCOL + "://android_asset/", html, "text/html", "utf-8", null);
+        content.loadContent(webView);
     }
 
     @MainThread
@@ -253,7 +170,6 @@ class Html2BitmapWebView {
         backgroundHandler.removeCallbacksAndMessages(null);
         handlerThread.interrupt();
         handlerThread.quit();
-
     }
 
     private void pageFinished(int delay) {
