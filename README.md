@@ -11,14 +11,14 @@ Height will be calculated using WebView.getContentHeight()
 ### Usage: 
 ```
 dependencies {
-    implementation 'com.izettle:html2bitmap:1.3'
+    implementation 'com.izettle:html2bitmap:1.5'
 }
 ```
 
 ```
-Bitmap bitmap = Html2Bitmap.getBitmap(context: Context, html: String, width: Int);
+Bitmap bitmap = new Html2Bitmap.Builder(context: Context, html: String).setBitmapWidth(width: Int).build().getBitmap();
 
-Bitmap bitmap = Html2Bitmap.getBitmap(context: Context, html: String, width: Int, timeOut: Int);
+Bitmap bitmap = new Html2Bitmap.Builder(context: Context, html: String).setBitmapWidth(width: Int).setTimeOut(timeout: Long).build().getBitmap();
 ```
 
 - **context** Used to create webview - application context is fine.
@@ -29,7 +29,7 @@ Bitmap bitmap = Html2Bitmap.getBitmap(context: Context, html: String, width: Int
 Calls are blocking and hence recommended to be moved into a background thread.
 
 ##### Under the hood
-Will wait for remote resources to load before generating bitmap i.e. "http://www.sample.com/image.jpg"
+Will wait for remote and local resources to load before generating bitmap i.e. "http://www.sample.com/image.jpg"
 will be downloaded before the screenshot is taken - _take this into account before defining a timeout for the whole process._
 
 Can be used anywhere you have access to a context. The purpose of the library was to perform its 
@@ -41,7 +41,8 @@ new AsyncTask<Void, Void, Bitmap>() {
     @Override
     protected Bitmap doInBackground(Void... voids) {
         String html = "<html><body><p>Hello world!</p><br/>Html bitmap</body><html>";
-        return Html2Bitmap.getBitmap(context, html, 450, 15);
+        
+        return new Html2Bitmap.Builder().setContext(context).setHtml(html).build().getBitmap();   
     }
 
     @Override
