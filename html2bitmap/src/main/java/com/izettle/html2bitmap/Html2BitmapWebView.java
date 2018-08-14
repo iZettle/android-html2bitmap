@@ -131,19 +131,26 @@ class Html2BitmapWebView {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                if (newProgress == 100 && content.done()) {
-                    pageFinished(measureDelay);
-                }
+                Log.i(TAG, "newProgress = " + newProgress + ", " + " done = " + content.done());
+                content.setProgress(newProgress);
             }
         });
+
+        content.setDoneListener(this);
 
         webView.setWebViewClient(new WebViewClient() {
 
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), Uri.parse(url));
-                return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, url);
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), Uri.parse(url));
+
+                    return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, url);
+                }
+
+                return super.shouldInterceptRequest(view, url);
             }
 
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

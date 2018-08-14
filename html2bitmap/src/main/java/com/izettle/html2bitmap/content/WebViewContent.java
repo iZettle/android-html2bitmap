@@ -9,11 +9,18 @@ import android.webkit.WebView;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class WebViewContent {
 
     protected AtomicInteger work = new AtomicInteger(0);
+
+    private List<LoadedResource> loadedResources = new ArrayList<>();
+    private List<LoadedResource> loadingResources;
+    private int progress;
+    private DoneListener doneListener;
 
     /***
      * Supports loading local files from /assets
@@ -41,10 +48,15 @@ public abstract class WebViewContent {
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public final WebResourceResponse loadResource(Context context, Uri uri) {
+
+        LoadedResource loadedResource = new LoadedResource(uri);
+        loadedResources.add(loadedResource);
+
         work.incrementAndGet();
         try {
             return loadResourceImpl(context, uri);
         } finally {
+            loadedResource.setLoaded(true);
             work.decrementAndGet();
         }
     }
@@ -68,8 +80,41 @@ public abstract class WebViewContent {
                 e.printStackTrace();
                 work.decrementAndGet();
             }
-
         }
         return null;
+    }
+
+    public List<LoadedResource> getRemoteResources() {
+        return loadedResources;
+    }
+
+    public List<LoadedResource> getLoadedResources() {
+        List<LoadedResource> loaded = new ArrayList<>();
+        for (LoadedResource loadedResource : loadedResources) {
+            if (loadedResource.isLoaded()) {
+                loaded.add(loadedResource);
+            }
+        }
+
+        return loaded;
+    }
+
+    public List<LoadedResource> getLoadingResources() {
+        List<LoadedResource> loading = new ArrayList<>();
+        for (LoadedResource loadedResource : loadedResources) {
+            if (!loadedResource.isLoaded()) {
+                loading.add(loadedResource);
+            }
+        }
+
+        return loading;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
+    }
+
+    public void setDoneListener(DoneListener doneListener) {
+        this.doneListener = doneListener;
     }
 }

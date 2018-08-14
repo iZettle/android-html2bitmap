@@ -10,9 +10,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 class WebViewAssetContent extends WebViewContent {
-    static final String HTML2BITMAP_PROTOCOL = "html2bitmap";
+    static final String HTML2BITMAP_PROTOCOL = "http";
 
-    private String baseUrl = HTML2BITMAP_PROTOCOL + "://android_asset/";
+    private String baseUrl = HTML2BITMAP_PROTOCOL + "://html2bitmap/";
     private String html;
 
     WebViewAssetContent(String html) {
@@ -27,7 +27,7 @@ class WebViewAssetContent extends WebViewContent {
     @Override
     public WebResourceResponse loadResourceImpl(Context context, Uri uri) {
         String protocol = uri.getScheme();
-        if (protocol.equals(HTML2BITMAP_PROTOCOL)) {
+        if (protocol.equals(HTML2BITMAP_PROTOCOL) && uri.getHost().equals("html2bitmap")) {
             return getAssetFile(context, uri);
         } else if (protocol.equals("http") || protocol.equals("https")) {
             return getRemoteFile(uri);
