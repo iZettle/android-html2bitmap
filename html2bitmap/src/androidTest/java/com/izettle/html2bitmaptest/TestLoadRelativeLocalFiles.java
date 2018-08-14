@@ -48,7 +48,7 @@ public class TestLoadRelativeLocalFiles {
 
         List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
-        assertEquals(3, loadedResources.size());
+        assertEquals(2, loadedResources.size());
         assertEquals(Uri.parse("http://html2bitmap/faces_200_400.png"), loadedResources.get(1).getUri());
     }
 
@@ -57,7 +57,7 @@ public class TestLoadRelativeLocalFiles {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.cssfonttest);
+        InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.remotefonttest);
 
         String html = stringFromStream(inputStream);
 
@@ -71,11 +71,33 @@ public class TestLoadRelativeLocalFiles {
 
         List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
-        assertEquals(4, loadedResources.size());
+        assertEquals(3, loadedResources.size());
         assertEquals(Uri.parse("https://fonts.googleapis.com/css?family=Hanalei+Fill"), loadedResources.get(1).getUri());
         assertEquals(Uri.parse("https://fonts.gstatic.com/s/hanaleifill/v6/fC1mPYtObGbfyQznIaQzPQi8UAjFhFqtag.ttf"), loadedResources.get(2).getUri());
     }
 
+    @Test
+    public void testLoadLocalFontFiles() throws IOException {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getTargetContext();
+
+        InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.localfonttest);
+
+        String html = stringFromStream(inputStream);
+
+        Html2Bitmap html2Bitmap = new Html2Bitmap.Builder()
+                .setContext(appContext)
+                .setContent(WebViewContent.html(html))
+                .setTimeout(15).build();
+
+        Bitmap bitmap = html2Bitmap.getBitmap();
+        assertNotNull(bitmap);
+
+        List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
+
+        assertEquals(2, loadedResources.size());
+        assertEquals(Uri.parse("http://html2bitmap/haneli.woff2"), loadedResources.get(1).getUri());
+    }
 
     private String stringFromStream(InputStream inputStream) throws IOException {
         BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
