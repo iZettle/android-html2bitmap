@@ -2,6 +2,7 @@ package com.izettle.html2bitmap.content;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.RestrictTo;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -10,7 +11,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class WebViewContent {
@@ -58,6 +61,7 @@ public abstract class WebViewContent {
         } finally {
             loadedResource.setLoaded(true);
             work.decrementAndGet();
+            progressChanged();
         }
     }
 
@@ -73,11 +77,24 @@ public abstract class WebViewContent {
                     @Override
                     public void onClose() {
                         work.decrementAndGet();
+                        progressChanged();
                     }
                 }, urlConnection.getInputStream());
-                return new WebResourceResponse(urlConnection.getContentType(), urlConnection.getContentEncoding(), in);
+                WebResourceResponse webResourceResponse = new WebResourceResponse(urlConnection.getContentType(), urlConnection.getContentEncoding(), in);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+                    Map<String, String> responseHeaders = new HashMap<>();
+
+                    for (String key : headerFields.keySet()) {
+                        responseHeaders.put(key, headerFields.get(key).get(0));
+                    }
+                    webResourceResponse.setResponseHeaders(responseHeaders);
+                }
+                return webResourceResponse;
             } catch (Exception e) {
                 e.printStackTrace();
+                progressChanged();
                 work.decrementAndGet();
             }
         }
@@ -112,6 +129,13 @@ public abstract class WebViewContent {
 
     public void setProgress(int progress) {
         this.progress = progress;
+        progressChanged();
+    }
+
+    void progressChanged() {
+        if (progress == 100 && work.get() == 0 && doneListener != null) {
+            doneListener.imDone();
+        }
     }
 
     public void setDoneListener(DoneListener doneListener) {

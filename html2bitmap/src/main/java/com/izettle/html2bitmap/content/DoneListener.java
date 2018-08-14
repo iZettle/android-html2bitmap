@@ -1,5 +1,5 @@
 package com.izettle.html2bitmap.content;
 
-interface DoneListener {
+public interface DoneListener {
     void imDone();
 }

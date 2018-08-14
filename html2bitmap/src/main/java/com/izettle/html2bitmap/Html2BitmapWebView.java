@@ -25,9 +25,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.izettle.html2bitmap.content.DoneListener;
 import com.izettle.html2bitmap.content.WebViewContent;
 
-class Html2BitmapWebView {
+import java.util.Map;
+
+class Html2BitmapWebView implements DoneListener {
     private static final String TAG = "Html2Bitmap";
     private static final int MSG_MEASURE = 2;
     private static final int MSG_SCREENSHOT = 5;
@@ -125,6 +128,7 @@ class Html2BitmapWebView {
         final WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
+        settings.setAllowUniversalAccessFromFileURLs(true);
 
         webView.setWebChromeClient(new WebChromeClient() {
 
@@ -157,8 +161,16 @@ class Html2BitmapWebView {
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
+                Map<String, String> headers = request.getRequestHeaders();
+                if (headers != null) {
+                    headers.put("Origin", "http://html2bitmap/");
+                }
+
                 WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), request.getUrl());
-                return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, request);
+                WebResourceResponse response = webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, request);
+
+                return response;
             }
         });
 
@@ -195,5 +207,10 @@ class Html2BitmapWebView {
 
         webView.draw(canvas);
         return bitmap;
+    }
+
+    @Override
+    public void imDone() {
+        pageFinished(measureDelay);
     }
 }

@@ -51,12 +51,14 @@ class WebViewAssetContent extends WebViewContent {
                     @Override
                     public void onClose() {
                         work.decrementAndGet();
+                        progressChanged();
                     }
                 }, context.getAssets().open(uri.getLastPathSegment()));
                 return new WebResourceResponse(mimeType, encoding, in);
             } catch (IOException e) {
                 e.printStackTrace();
                 work.decrementAndGet();
+                progressChanged();
             }
         }
 
