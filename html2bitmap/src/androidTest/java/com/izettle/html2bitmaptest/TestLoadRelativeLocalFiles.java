@@ -49,7 +49,7 @@ public class TestLoadRelativeLocalFiles {
         List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
         assertEquals(2, loadedResources.size());
-        assertEquals(Uri.parse("http://html2bitmap/faces_200_400.png"), loadedResources.get(1).getUri());
+        assertEquals(Uri.parse("html2bitmap://android_assets/faces_200_400.png"), loadedResources.get(1).getUri());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class TestLoadRelativeLocalFiles {
         List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
         assertEquals(2, loadedResources.size());
-        assertEquals(Uri.parse("http://html2bitmap/haneli.woff2"), loadedResources.get(1).getUri());
+        assertEquals(Uri.parse("html2bitmap://android_assets/haneli.woff2"), loadedResources.get(1).getUri());
     }
 
     private String stringFromStream(InputStream inputStream) throws IOException {
