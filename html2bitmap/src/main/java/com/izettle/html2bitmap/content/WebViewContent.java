@@ -40,8 +40,14 @@ public abstract class WebViewContent {
 
     public abstract void loadContent(WebView webview);
 
-    public boolean done() {
-        return getLoadingResources().size() == 0;
+    public boolean isDone() {
+        for (WebViewResource webViewResource : webViewResources) {
+            if (!webViewResource.isLoaded()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     abstract WebResourceResponse loadResourceImpl(Context context, WebViewResource webViewResource);
@@ -55,6 +61,7 @@ public abstract class WebViewContent {
         return loadResourceImpl(context, webViewResource);
     }
 
+    @SuppressWarnings("WeakerAccess")
     protected WebResourceResponse getRemoteFile(final WebViewResource webViewResource) {
         Uri uri = webViewResource.getUri();
         String protocol = uri.getScheme();
@@ -67,7 +74,7 @@ public abstract class WebViewContent {
                     @Override
                     public void onClose() {
                         webViewResource.setLoaded();
-                        resourceLoaded(webViewResource);
+                        resourceLoaded();
                     }
                 }, urlConnection.getInputStream());
 
@@ -87,11 +94,11 @@ public abstract class WebViewContent {
             } catch (Exception e) {
                 e.printStackTrace();
                 webViewResource.setException(e);
-                resourceLoaded(webViewResource);
+                resourceLoaded();
             }
         } else {
             webViewResource.setNativeLoad();
-            resourceLoaded(webViewResource);
+            resourceLoaded();
         }
         return null;
     }
@@ -101,20 +108,9 @@ public abstract class WebViewContent {
     }
 
 
-    public List<WebViewResource> getLoadingResources() {
-        List<WebViewResource> loading = new ArrayList<>();
-        for (WebViewResource webViewResource : webViewResources) {
-            if (!webViewResource.isLoaded()) {
-                loading.add(webViewResource);
-            }
-        }
-
-        return loading;
-    }
-
-    void resourceLoaded(WebViewResource webViewResource) {
+    void resourceLoaded() {
         ProgressChangedListener progressChangedListener = this.doneListenerWeakReference.get();
-        if (done() && this.doneListenerWeakReference != null) {
+        if (isDone() && this.doneListenerWeakReference != null) {
             progressChangedListener.progressChanged();
         }
     }

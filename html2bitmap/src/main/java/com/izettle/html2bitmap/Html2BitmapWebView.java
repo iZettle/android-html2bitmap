@@ -64,7 +64,7 @@ class Html2BitmapWebView implements ProgressChangedListener {
                     return;
                 }
 
-                if (!content.done()) {
+                if (!content.isDone()) {
                     return;
                 }
 
@@ -90,7 +90,7 @@ class Html2BitmapWebView implements ProgressChangedListener {
         backgroundHandler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (!content.done()) {
+                if (!content.isDone()) {
                     return;
                 }
 
@@ -127,14 +127,13 @@ class Html2BitmapWebView implements ProgressChangedListener {
         final WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
-        settings.setAllowUniversalAccessFromFileURLs(true);
 
         webView.setWebChromeClient(new WebChromeClient() {
 
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                Log.i(TAG, "newProgress = " + newProgress + ", " + " progressChanged = " + content.done());
+                Log.i(TAG, "newProgress = " + newProgress + ", " + " progressChanged = " + content.isDone());
                 progress = newProgress;
                 progressChanged();
             }
@@ -205,7 +204,7 @@ class Html2BitmapWebView implements ProgressChangedListener {
 
     @Override
     public void progressChanged() {
-        if (progress == 100 && content.done()) {
+        if (progress == 100 && content.isDone()) {
             pageFinished(measureDelay);
         }
     }

@@ -23,7 +23,7 @@ class WebViewRemoteContent extends WebViewContent {
     public WebResourceResponse loadResourceImpl(Context context, WebViewResource webViewResource) {
         if (webViewResource.getUri().equals(Uri.parse(url.toString()))) {
             webViewResource.setNativeLoad();
-            resourceLoaded(webViewResource);
+            resourceLoaded();
             return null;
         }
 

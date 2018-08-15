@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 class WebViewAssetContent extends WebViewContent {
     static final String HTML2BITMAP_PROTOCOL = "html2bitmap";
 
-    private String baseUrl = HTML2BITMAP_PROTOCOL + "://android_assets/";
+    private String baseUrl = HTML2BITMAP_PROTOCOL + "://android_asset/";
     private String html;
 
     WebViewAssetContent(String html) {
@@ -53,19 +53,19 @@ class WebViewAssetContent extends WebViewContent {
                     @Override
                     public void onClose() {
                         webViewResource.setLoaded();
-                        resourceLoaded(webViewResource);
+                        resourceLoaded();
                     }
                 }, context.getAssets().open(uri.getLastPathSegment()));
                 return new WebResourceResponse(mimeType, encoding, in);
             } catch (IOException e) {
                 e.printStackTrace();
                 webViewResource.setException(e);
-                resourceLoaded(webViewResource);
+                resourceLoaded();
             }
         } else {
 
             webViewResource.setNativeLoad();
-            resourceLoaded(webViewResource);
+            resourceLoaded();
         }
 
         return null;
