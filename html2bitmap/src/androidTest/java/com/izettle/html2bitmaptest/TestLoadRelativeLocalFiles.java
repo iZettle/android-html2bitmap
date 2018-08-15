@@ -8,8 +8,8 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.izettle.html2bitmap.Html2Bitmap;
 import com.izettle.html2bitmap.R;
-import com.izettle.html2bitmap.content.LoadedResource;
 import com.izettle.html2bitmap.content.WebViewContent;
+import com.izettle.html2bitmap.content.WebViewResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,15 +41,16 @@ public class TestLoadRelativeLocalFiles {
         Html2Bitmap html2Bitmap = new Html2Bitmap.Builder()
                 .setContext(appContext)
                 .setContent(WebViewContent.html("<html><body><h1>Hello world</h1><img src='faces_200_400.png'></body</html>"))
-                .setTimeout(15).build();
+                .setTimeout(15)
+                .build();
 
         Bitmap bitmap = html2Bitmap.getBitmap();
         assertNotNull(bitmap);
 
-        List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
+        List<WebViewResource> webViewResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
-        assertEquals(2, loadedResources.size());
-        assertEquals(Uri.parse("html2bitmap://android_assets/faces_200_400.png"), loadedResources.get(1).getUri());
+        assertEquals(2, webViewResources.size());
+        assertEquals(Uri.parse("html2bitmap://android_assets/faces_200_400.png"), webViewResources.get(1).getUri());
     }
 
     @Test
@@ -69,11 +70,11 @@ public class TestLoadRelativeLocalFiles {
         Bitmap bitmap = html2Bitmap.getBitmap();
         assertNotNull(bitmap);
 
-        List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
+        List<WebViewResource> webViewResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
-        assertEquals(3, loadedResources.size());
-        assertEquals(Uri.parse("https://fonts.googleapis.com/css?family=Hanalei+Fill"), loadedResources.get(1).getUri());
-        assertEquals(Uri.parse("https://fonts.gstatic.com/s/hanaleifill/v6/fC1mPYtObGbfyQznIaQzPQi8UAjFhFqtag.ttf"), loadedResources.get(2).getUri());
+        assertEquals(3, webViewResources.size());
+        assertEquals(Uri.parse("https://fonts.googleapis.com/css?family=Hanalei+Fill"), webViewResources.get(1).getUri());
+        assertEquals(Uri.parse("https://fonts.gstatic.com/s/hanaleifill/v6/fC1mPYtObGbfyQznIaQzPQi8UAjFhFqtag.ttf"), webViewResources.get(2).getUri());
     }
 
     @Test
@@ -93,10 +94,10 @@ public class TestLoadRelativeLocalFiles {
         Bitmap bitmap = html2Bitmap.getBitmap();
         assertNotNull(bitmap);
 
-        List<LoadedResource> loadedResources = html2Bitmap.getWebViewContent().getRemoteResources();
+        List<WebViewResource> webViewResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
-        assertEquals(2, loadedResources.size());
-        assertEquals(Uri.parse("html2bitmap://android_assets/haneli.woff2"), loadedResources.get(1).getUri());
+        assertEquals(2, webViewResources.size());
+        assertEquals(Uri.parse("html2bitmap://android_assets/haneli.woff2"), webViewResources.get(1).getUri());
     }
 
     private String stringFromStream(InputStream inputStream) throws IOException {

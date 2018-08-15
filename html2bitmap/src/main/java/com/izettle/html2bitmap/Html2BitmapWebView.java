@@ -25,12 +25,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.izettle.html2bitmap.content.DoneListener;
+import com.izettle.html2bitmap.content.ProgressChangedListener;
 import com.izettle.html2bitmap.content.WebViewContent;
 
-import java.util.Map;
-
-class Html2BitmapWebView implements DoneListener {
+class Html2BitmapWebView implements ProgressChangedListener {
     private static final String TAG = "Html2Bitmap";
     private static final int MSG_MEASURE = 2;
     private static final int MSG_SCREENSHOT = 5;
@@ -44,6 +42,7 @@ class Html2BitmapWebView implements DoneListener {
     private final Context context;
     private BitmapCallback callback;
     private WebView webView;
+    private int progress;
 
 
     @AnyThread
@@ -135,8 +134,9 @@ class Html2BitmapWebView implements DoneListener {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                Log.i(TAG, "newProgress = " + newProgress + ", " + " done = " + content.done());
-                content.setProgress(newProgress);
+                Log.i(TAG, "newProgress = " + newProgress + ", " + " progressChanged = " + content.done());
+                progress = newProgress;
+                progressChanged();
             }
         });
 
@@ -162,15 +162,9 @@ class Html2BitmapWebView implements DoneListener {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
 
-                Map<String, String> headers = request.getRequestHeaders();
-                if (headers != null) {
-                    headers.put("Origin", "http://html2bitmap/");
-                }
-
                 WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), request.getUrl());
-                WebResourceResponse response = webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, request);
 
-                return response;
+                return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, request);
             }
         });
 
@@ -210,7 +204,9 @@ class Html2BitmapWebView implements DoneListener {
     }
 
     @Override
-    public void imDone() {
-        pageFinished(measureDelay);
+    public void progressChanged() {
+        if (progress == 100 && content.done()) {
+            pageFinished(measureDelay);
+        }
     }
 }
