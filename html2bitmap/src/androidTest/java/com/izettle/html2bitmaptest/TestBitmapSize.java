@@ -33,7 +33,14 @@ public class TestBitmapSize {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setContent(WebViewContent.html("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>")).setBitmapWidth(300).setTimeout(300).build().getBitmap();
+        Bitmap bitmap = new Html2Bitmap.Builder()
+                .setContext(appContext)
+                .setStrictMode(true)
+                .setContent(WebViewContent.html("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>"))
+                .setBitmapWidth(300)
+                .setTimeout(5)
+                .build().getBitmap();
+
         assertNotNull(bitmap);
         assertEquals(300, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(100), lessThan(110)));
@@ -44,7 +51,12 @@ public class TestBitmapSize {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setContent(WebViewContent.html("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>")).setBitmapWidth(800).setTimeout(300).build().getBitmap();
+        Bitmap bitmap = new Html2Bitmap.Builder()
+                .setContext(appContext)
+                .setContent(WebViewContent.html("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>"))
+                .setBitmapWidth(800)
+                .setTimeout(5)
+                .build().getBitmap();
         assertNotNull(bitmap);
         assertEquals(800, bitmap.getWidth());
         assertThat(bitmap.getHeight(), allOf(greaterThan(100), lessThan(110)));
@@ -59,7 +71,12 @@ public class TestBitmapSize {
         for (int i = 0; i < 20; i++) {
             sb.append("<p>i</p>");
         }
-        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setContent(WebViewContent.html("<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>")).setBitmapWidth(100).setTimeout(300).build().getBitmap();
+        Bitmap bitmap = new Html2Bitmap.Builder()
+                .setContext(appContext)
+                .setContent(WebViewContent.html("<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>"))
+                .setBitmapWidth(100)
+                .setTimeout(5)
+                .build().getBitmap();
 
         assertNotNull(bitmap);
         assertEquals(100, bitmap.getWidth());
@@ -76,7 +93,12 @@ public class TestBitmapSize {
             sb.append("<p>i</p>");
         }
 
-        Bitmap bitmap = new Html2Bitmap.Builder().setContext(appContext).setContent(WebViewContent.html("<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>")).setBitmapWidth(100).setTimeout(300).build().getBitmap();
+        Bitmap bitmap = new Html2Bitmap.Builder()
+                .setContext(appContext)
+                .setContent(WebViewContent.html("<html><body><h1>Hello world</h1>" + sb.toString() + "<p>foo <strong>bar</strong></p></body</html>"))
+                .setBitmapWidth(100)
+                .setTimeout(300)
+                .build().getBitmap();
 
         assertNotNull(bitmap);
         assertEquals(100, bitmap.getWidth());

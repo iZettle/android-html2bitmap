@@ -25,20 +25,22 @@ class WebViewAssetContent extends WebViewContent {
     }
 
     @Override
-    public WebResourceResponse loadResourceImpl(Context context, Uri uri) {
-        String protocol = uri.getScheme();
+    public WebResourceResponse loadResourceImpl(Context context, WebViewResource webViewResource) {
+        String protocol = webViewResource.getUri().getScheme();
         if (protocol.equals(HTML2BITMAP_PROTOCOL)) {
-            return getAssetFile(context, uri);
+            return getAssetFile(context, webViewResource);
         } else if (protocol.equals("http") || protocol.equals("https")) {
-            return getRemoteFile(uri);
+            return getRemoteFile(webViewResource);
+        } else {
+            webViewResource.setLoaded();
         }
         return null;
     }
 
 
-    private WebResourceResponse getAssetFile(Context context, Uri uri) {
+    private WebResourceResponse getAssetFile(Context context, final WebViewResource webViewResource) {
+        final Uri uri = webViewResource.getUri();
         if (uri.getScheme().equals(HTML2BITMAP_PROTOCOL)) {
-            work.incrementAndGet();
 
             try {
                 String mimeType = context.getContentResolver().getType(uri);
@@ -50,14 +52,20 @@ class WebViewAssetContent extends WebViewContent {
                 InputStream in = new InputStreamWrapper(new InputStreamWrapper.Callback() {
                     @Override
                     public void onClose() {
-                        work.decrementAndGet();
+                        webViewResource.setLoaded();
+                        resourceLoaded();
                     }
                 }, context.getAssets().open(uri.getLastPathSegment()));
                 return new WebResourceResponse(mimeType, encoding, in);
             } catch (IOException e) {
                 e.printStackTrace();
-                work.decrementAndGet();
+                webViewResource.setException(e);
+                resourceLoaded();
             }
+        } else {
+
+            webViewResource.setNativeLoad();
+            resourceLoaded();
         }
 
         return null;

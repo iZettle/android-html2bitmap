@@ -25,9 +25,10 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.izettle.html2bitmap.content.ProgressChangedListener;
 import com.izettle.html2bitmap.content.WebViewContent;
 
-class Html2BitmapWebView {
+class Html2BitmapWebView implements ProgressChangedListener {
     private static final String TAG = "Html2Bitmap";
     private static final int MSG_MEASURE = 2;
     private static final int MSG_SCREENSHOT = 5;
@@ -41,6 +42,7 @@ class Html2BitmapWebView {
     private final Context context;
     private BitmapCallback callback;
     private WebView webView;
+    private int progress;
 
 
     @AnyThread
@@ -62,7 +64,7 @@ class Html2BitmapWebView {
                     return;
                 }
 
-                if (!content.done()) {
+                if (!content.isDone()) {
                     return;
                 }
 
@@ -88,7 +90,7 @@ class Html2BitmapWebView {
         backgroundHandler = new Handler(handlerThread.getLooper()) {
             @Override
             public void handleMessage(Message msg) {
-                if (!content.done()) {
+                if (!content.isDone()) {
                     return;
                 }
 
@@ -131,26 +133,36 @@ class Html2BitmapWebView {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                if (newProgress == 100 && content.done()) {
-                    pageFinished(measureDelay);
-                }
+                Log.i(TAG, "newProgress = " + newProgress + ", " + " progressChanged = " + content.isDone());
+                progress = newProgress;
+                progressChanged();
             }
         });
+
+        content.setDoneListener(this);
 
         webView.setWebViewClient(new WebViewClient() {
 
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), Uri.parse(url));
-                return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, url);
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), Uri.parse(url));
+
+                    return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, url);
+                }
+
+                return super.shouldInterceptRequest(view, url);
             }
 
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
                 WebResourceResponse webResourceResponse = content.loadResource(view.getContext(), request.getUrl());
+
                 return webResourceResponse != null ? webResourceResponse : super.shouldInterceptRequest(view, request);
             }
         });
@@ -188,5 +200,12 @@ class Html2BitmapWebView {
 
         webView.draw(canvas);
         return bitmap;
+    }
+
+    @Override
+    public void progressChanged() {
+        if (progress == 100 && content.isDone()) {
+            pageFinished(measureDelay);
+        }
     }
 }

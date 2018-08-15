@@ -59,7 +59,8 @@ public class Html2Bitmap {
         try {
             return bitmapFutureTask.get(html2Bitmap.timeout, TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
-            Log.e(TAG, "", e);
+
+            Log.e(TAG, html2Bitmap.content.getRemoteResources().toString(), e);
         } finally {
             mainHandler.post(new Runnable() {
                 @Override
@@ -73,6 +74,10 @@ public class Html2Bitmap {
 
     public Bitmap getBitmap() {
         return getBitmap(this);
+    }
+
+    public WebViewContent getWebViewContent() {
+        return content;
     }
 
     public static class Builder {

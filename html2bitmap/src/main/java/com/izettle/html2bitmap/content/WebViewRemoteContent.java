@@ -20,14 +20,13 @@ class WebViewRemoteContent extends WebViewContent {
     }
 
     @Override
-    public WebResourceResponse loadResourceImpl(Context context, Uri uri) {
-        if (uri.equals(Uri.parse(url.toString()))) {
+    public WebResourceResponse loadResourceImpl(Context context, WebViewResource webViewResource) {
+        if (webViewResource.getUri().equals(Uri.parse(url.toString()))) {
+            webViewResource.setNativeLoad();
+            resourceLoaded();
             return null;
         }
-        String protocol = uri.getScheme();
-        if (protocol.equals("http") || protocol.equals("https")) {
-            return getRemoteFile(uri);
-        }
-        return null;
+
+        return getRemoteFile(webViewResource);
     }
 }
