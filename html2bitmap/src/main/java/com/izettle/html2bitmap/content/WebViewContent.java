@@ -100,16 +100,6 @@ public abstract class WebViewContent {
         return webViewResources;
     }
 
-    public List<WebViewResource> getWebViewResources() {
-        List<WebViewResource> loaded = new ArrayList<>();
-        for (WebViewResource webViewResource : webViewResources) {
-            if (webViewResource.isLoaded()) {
-                loaded.add(webViewResource);
-            }
-        }
-
-        return loaded;
-    }
 
     public List<WebViewResource> getLoadingResources() {
         List<WebViewResource> loading = new ArrayList<>();

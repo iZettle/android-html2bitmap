@@ -8,9 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.izettle.html2bitmap.content.WebViewContent;
-import com.izettle.html2bitmap.content.WebViewResource;
 
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -61,10 +59,8 @@ public class Html2Bitmap {
         try {
             return bitmapFutureTask.get(html2Bitmap.timeout, TimeUnit.SECONDS);
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
-            List<WebViewResource> remote = html2Bitmap.content.getRemoteResources();
-            List<WebViewResource> loaded = html2Bitmap.content.getWebViewResources();
-            List<WebViewResource> loading = html2Bitmap.content.getLoadingResources();
-            Log.e(TAG, "remote = " + remote.size() + "\nloaded = " + loaded.size() + "\nloading = " + loading.size() + "\n" + remote.toString(), e);
+
+            Log.e(TAG, html2Bitmap.content.getRemoteResources().toString(), e);
         } finally {
             mainHandler.post(new Runnable() {
                 @Override
