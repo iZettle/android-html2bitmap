@@ -39,6 +39,7 @@ class Html2BitmapWebView implements ProgressChangedListener {
     private final int measureDelay;
     private final WebViewContent content;
     private final int bitmapWidth;
+    private final Integer textZoom;
     private final Context context;
     private BitmapCallback callback;
     private WebView webView;
@@ -46,11 +47,12 @@ class Html2BitmapWebView implements ProgressChangedListener {
 
 
     @AnyThread
-    Html2BitmapWebView(@NonNull final Context context, @NonNull final WebViewContent content, final int bitmapWidth, final int measureDelay, final int screenshotDelay, final boolean strictMode) {
+    Html2BitmapWebView(@NonNull final Context context, @NonNull final WebViewContent content, final int bitmapWidth, final int measureDelay, final int screenshotDelay, final boolean strictMode, final Integer textZoom) {
         this.context = context;
         this.content = content;
         this.bitmapWidth = bitmapWidth;
         this.measureDelay = measureDelay;
+        this.textZoom = textZoom;
 
         mainHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -127,6 +129,8 @@ class Html2BitmapWebView implements ProgressChangedListener {
         final WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
+        if (textZoom != null)
+            settings.setTextZoom(textZoom);
 
         webView.setWebChromeClient(new WebChromeClient() {
 
