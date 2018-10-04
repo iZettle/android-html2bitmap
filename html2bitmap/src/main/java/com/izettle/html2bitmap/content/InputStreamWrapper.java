@@ -1,10 +1,10 @@
 package com.izettle.html2bitmap.content;
 
-import android.support.annotation.NonNull;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import androidx.annotation.NonNull;
 
 class InputStreamWrapper extends BufferedInputStream {
 

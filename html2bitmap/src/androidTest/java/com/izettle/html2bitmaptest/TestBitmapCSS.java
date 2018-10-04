@@ -2,8 +2,6 @@ package com.izettle.html2bitmaptest;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.izettle.html2bitmap.Html2Bitmap;
 import com.izettle.html2bitmap.R;
@@ -16,6 +14,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;

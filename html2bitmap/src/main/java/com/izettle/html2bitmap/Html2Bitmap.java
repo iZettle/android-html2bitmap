@@ -3,8 +3,6 @@ package com.izettle.html2bitmap;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.izettle.html2bitmap.content.WebViewContent;
@@ -15,6 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 
 public class Html2Bitmap {

@@ -2,8 +2,6 @@ package com.izettle.html2bitmaptest;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.izettle.html2bitmap.Html2Bitmap;
 import com.izettle.html2bitmap.content.WebViewContent;
@@ -12,6 +10,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.net.URL;
+
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
 
 import static org.junit.Assert.assertNotNull;
 

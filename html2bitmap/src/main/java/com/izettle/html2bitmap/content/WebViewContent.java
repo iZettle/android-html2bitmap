@@ -3,7 +3,6 @@ package com.izettle.html2bitmap.content;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RestrictTo;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 
@@ -15,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.RestrictTo;
 
 public abstract class WebViewContent {
 

@@ -11,11 +11,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.AnyThread;
-import android.support.annotation.MainThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -27,6 +22,12 @@ import android.webkit.WebViewClient;
 
 import com.izettle.html2bitmap.content.ProgressChangedListener;
 import com.izettle.html2bitmap.content.WebViewContent;
+
+import androidx.annotation.AnyThread;
+import androidx.annotation.MainThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 class Html2BitmapWebView implements ProgressChangedListener {
     private static final String TAG = "Html2Bitmap";
