@@ -32,27 +32,34 @@ class Html2BitmapWebView implements ProgressChangedListener {
     private static final String TAG = "Html2Bitmap";
     private static final int MSG_MEASURE = 2;
     private static final int MSG_SCREENSHOT = 5;
+    @NonNull
     private final HandlerThread handlerThread;
+    @NonNull
     private final Handler backgroundHandler;
+    @NonNull
     private final Handler mainHandler;
-
     private final int measureDelay;
+    @Nullable
+    private final Html2BitmapConfigurator html2BitmapConfigurator;
+    @NonNull
     private final WebViewContent content;
     private final int bitmapWidth;
+    @Nullable
     private final Integer textZoom;
+    @NonNull
     private final Context context;
     private BitmapCallback callback;
     private WebView webView;
     private int progress;
 
-
     @AnyThread
-    Html2BitmapWebView(@NonNull final Context context, @NonNull final WebViewContent content, final int bitmapWidth, final int measureDelay, final int screenshotDelay, final boolean strictMode, final Integer textZoom) {
+    Html2BitmapWebView(@NonNull final Context context, @NonNull final WebViewContent content, final int bitmapWidth, final int measureDelay, final int screenshotDelay, final boolean strictMode, @Nullable final Integer textZoom, @Nullable Html2BitmapConfigurator html2BitmapConfigurator) {
         this.context = context;
         this.content = content;
         this.bitmapWidth = bitmapWidth;
         this.measureDelay = measureDelay;
         this.textZoom = textZoom;
+        this.html2BitmapConfigurator = html2BitmapConfigurator;
 
         mainHandler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -129,8 +136,14 @@ class Html2BitmapWebView implements ProgressChangedListener {
         final WebSettings settings = webView.getSettings();
         settings.setBuiltInZoomControls(false);
         settings.setSupportZoom(false);
-        if (textZoom != null)
+
+        if (textZoom != null) {
             settings.setTextZoom(textZoom);
+        }
+
+        if (html2BitmapConfigurator != null) {
+            html2BitmapConfigurator.configureWebView(webView);
+        }
 
         webView.setWebChromeClient(new WebChromeClient() {
 

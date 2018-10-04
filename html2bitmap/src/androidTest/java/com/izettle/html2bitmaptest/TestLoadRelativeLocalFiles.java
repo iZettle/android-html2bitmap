@@ -26,16 +26,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(AndroidJUnit4.class)
 public class TestLoadRelativeLocalFiles {
     @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.izettle.html2bitmap.test", appContext.getPackageName());
-    }
-
-    @Test
     public void testLoadRelativeImage() {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         Html2Bitmap html2Bitmap = new Html2Bitmap.Builder()
@@ -49,13 +40,12 @@ public class TestLoadRelativeLocalFiles {
 
         List<WebViewResource> webViewResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
-        assertEquals(2, webViewResources.size());
-        assertEquals(Uri.parse("html2bitmap://android_assets/faces_200_400.png"), webViewResources.get(1).getUri());
+        assertEquals(webViewResources.toString(), 2, webViewResources.size());
+        assertEquals(Uri.parse("html2bitmap://android_asset/faces_200_400.png"), webViewResources.get(1).getUri());
     }
 
     @Test
     public void testLoadRemoteFontFilesFromGoogle() throws IOException {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.remotefonttest);
@@ -79,7 +69,6 @@ public class TestLoadRelativeLocalFiles {
 
     @Test
     public void testLoadLocalFontFiles() throws IOException {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.localfonttest);
@@ -97,7 +86,7 @@ public class TestLoadRelativeLocalFiles {
         List<WebViewResource> webViewResources = html2Bitmap.getWebViewContent().getRemoteResources();
 
         assertEquals(2, webViewResources.size());
-        assertEquals(Uri.parse("html2bitmap://android_assets/haneli.woff2"), webViewResources.get(1).getUri());
+        assertEquals(Uri.parse("html2bitmap://android_asset/haneli.woff2"), webViewResources.get(1).getUri());
     }
 
     private String stringFromStream(InputStream inputStream) throws IOException {

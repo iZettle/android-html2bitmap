@@ -20,17 +20,9 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapSize {
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.izettle.html2bitmap.test", appContext.getPackageName());
-    }
 
     @Test
     public void testBitmap() {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         Bitmap bitmap = new Html2Bitmap.Builder()
@@ -48,7 +40,6 @@ public class TestBitmapSize {
 
     @Test
     public void testWideBitmap() {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         Bitmap bitmap = new Html2Bitmap.Builder()
@@ -64,7 +55,6 @@ public class TestBitmapSize {
 
     @Test
     public void testLongBitmap() {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         StringBuilder sb = new StringBuilder();
@@ -85,7 +75,6 @@ public class TestBitmapSize {
 
     @Test
     public void testExtraLongBitmap() {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         StringBuilder sb = new StringBuilder();

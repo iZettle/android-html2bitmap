@@ -2,9 +2,12 @@ package com.example.html2bitmapdemo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.webkit.WebView;
 
 import com.izettle.html2bitmap.Html2Bitmap;
+import com.izettle.html2bitmap.Html2BitmapConfigurator;
 import com.izettle.html2bitmap.content.WebViewContent;
 
 import java.lang.ref.WeakReference;
@@ -27,7 +30,15 @@ class BitmapGeneratingAsyncTask extends AsyncTask<Void, Void, Bitmap> {
     protected Bitmap doInBackground(Void... voids) {
         Context context = this.context.get();
 
-        return new Html2Bitmap.Builder()
+        Html2BitmapConfigurator html2BitmapConfigurator = new Html2BitmapConfigurator() {
+            @Override
+            public void configureWebView(WebView webview) {
+                webview.setBackgroundColor(Color.MAGENTA);
+                webview.getSettings().setTextZoom(150);
+            }
+        };
+
+        Html2Bitmap build = new Html2Bitmap.Builder()
                 .setContext(context)
                 .setContent(WebViewContent.html(html))
                 .setBitmapWidth(width)
@@ -35,8 +46,11 @@ class BitmapGeneratingAsyncTask extends AsyncTask<Void, Void, Bitmap> {
                 .setScreenshotDelay(10)
                 .setStrictMode(true)
                 .setTimeout(5)
-                .build()
-                .getBitmap();
+                .setTextZoom(150)
+                .setConfigurator(html2BitmapConfigurator)
+                .build();
+
+        return build.getBitmap();
 
     }
 
