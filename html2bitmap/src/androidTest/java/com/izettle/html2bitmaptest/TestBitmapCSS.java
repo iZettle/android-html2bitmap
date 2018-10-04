@@ -27,16 +27,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapCSS {
     @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.izettle.html2bitmap.test", appContext.getPackageName());
-    }
-
-    @Test
     public void testBitmap() throws Exception {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.csstest);

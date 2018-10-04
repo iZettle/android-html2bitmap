@@ -13,22 +13,13 @@ import org.junit.runner.RunWith;
 
 import java.net.URL;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class TestRemote {
-    @Test
-    public void useAppContext() {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        assertEquals("com.izettle.html2bitmap.test", appContext.getPackageName());
-    }
 
     @Test
     public void restRemote() throws Exception {
-        // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         String url = "https://raw.githubusercontent.com/iZettle/android-html2bitmap/develop/html2bitmap/src/debug/res/raw/simple.html";
