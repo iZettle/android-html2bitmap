@@ -27,8 +27,9 @@ public class Html2Bitmap {
     private final int screenshotDelay;
     private boolean strictMode;
     private long timeout;
+    private Integer textZoom;
 
-    private Html2Bitmap(Context context, WebViewContent content, int bitmapWidth, int measureDelay, int screenshotDelay, boolean strictMode, long timeout) {
+    private Html2Bitmap(Context context, WebViewContent content, int bitmapWidth, int measureDelay, int screenshotDelay, boolean strictMode, long timeout, Integer textZoom) {
         this.context = context;
         this.content = content;
         this.bitmapWidth = bitmapWidth;
@@ -36,6 +37,7 @@ public class Html2Bitmap {
         this.screenshotDelay = screenshotDelay;
         this.strictMode = strictMode;
         this.timeout = timeout;
+        this.textZoom = textZoom;
     }
 
     @Nullable
@@ -48,7 +50,7 @@ public class Html2Bitmap {
 
         Handler mainHandler = new Handler(html2Bitmap.context.getMainLooper());
 
-        final Html2BitmapWebView html2BitmapWebView = new Html2BitmapWebView(html2Bitmap.context, html2Bitmap.content, html2Bitmap.bitmapWidth, html2Bitmap.measureDelay, html2Bitmap.screenshotDelay, html2Bitmap.strictMode);
+        final Html2BitmapWebView html2BitmapWebView = new Html2BitmapWebView(html2Bitmap.context, html2Bitmap.content, html2Bitmap.bitmapWidth, html2Bitmap.measureDelay, html2Bitmap.screenshotDelay, html2Bitmap.strictMode, html2Bitmap.textZoom);
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -88,6 +90,7 @@ public class Html2Bitmap {
         private boolean strictMode = false;
         private long timeout = 15;
         private WebViewContent content;
+        private Integer textZoom = null;
 
         public Builder() {
 
@@ -133,6 +136,11 @@ public class Html2Bitmap {
             return this;
         }
 
+        public Builder setTextZoom(Integer textZoom) {
+            this.textZoom = textZoom;
+            return this;
+        }
+
         public Html2Bitmap build() {
             if (context == null) {
                 throw new NullPointerException();
@@ -140,7 +148,7 @@ public class Html2Bitmap {
             if (content == null) {
                 throw new NullPointerException();
             }
-            return new Html2Bitmap(context, content, bitmapWidth, measureDelay, screenshotDelay, strictMode, timeout);
+            return new Html2Bitmap(context, content, bitmapWidth, measureDelay, screenshotDelay, strictMode, timeout, textZoom);
         }
     }
 }
