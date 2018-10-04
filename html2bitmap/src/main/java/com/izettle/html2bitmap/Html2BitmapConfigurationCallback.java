@@ -1,7 +1,8 @@
 package com.izettle.html2bitmap;
 
-import android.support.annotation.MainThread;
 import android.webkit.WebView;
+
+import androidx.annotation.MainThread;
 
 interface Html2BitmapConfigurationCallback {
     @MainThread
