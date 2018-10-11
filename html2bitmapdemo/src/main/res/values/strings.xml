@@ -16,4 +16,5 @@
     <string name="generate_bitmap">Generate bitmap</string>
     <string name="enter_width">Enter Width</string>
     <string name="_150">150</string>
+    <string name="bitmap_generated_from_html">Bitmap generated from html</string>
 </resources>
