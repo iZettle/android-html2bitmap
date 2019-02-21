@@ -151,7 +151,6 @@ class Html2BitmapWebView implements ProgressChangedListener {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-                Log.i(TAG, "newProgress = " + newProgress + ", " + " progressChanged = " + content.isDone());
                 progress = newProgress;
                 progressChanged();
             }
