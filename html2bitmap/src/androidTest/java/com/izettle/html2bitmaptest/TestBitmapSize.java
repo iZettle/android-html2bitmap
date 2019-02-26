@@ -6,11 +6,12 @@ import android.graphics.Bitmap;
 import com.izettle.html2bitmap.Html2Bitmap;
 import com.izettle.html2bitmap.content.WebViewContent;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -22,9 +23,15 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapSize {
 
+    private Context appContext;
+
+    @Before
+    public void setUp() {
+        appContext = ApplicationProvider.getApplicationContext();
+    }
+
     @Test
     public void testBitmap() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
 
         Bitmap bitmap = new Html2Bitmap.Builder()
                 .setContext(appContext)
@@ -41,8 +48,6 @@ public class TestBitmapSize {
 
     @Test
     public void testWideBitmap() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
         Bitmap bitmap = new Html2Bitmap.Builder()
                 .setContext(appContext)
                 .setContent(WebViewContent.html("<html><body><h1>Hello world</h1><p>foo <strong>bar</strong></p></body</html>"))
@@ -56,8 +61,6 @@ public class TestBitmapSize {
 
     @Test
     public void testLongBitmap() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 20; i++) {
             sb.append("<p>i</p>");
@@ -76,8 +79,6 @@ public class TestBitmapSize {
 
     @Test
     public void testExtraLongBitmap() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 500; i++) {
             sb.append("<p>i</p>");
@@ -93,6 +94,6 @@ public class TestBitmapSize {
         assertNotNull(bitmap);
         assertEquals(100, bitmap.getWidth());
 
-        assertThat(bitmap.getHeight(), allOf(greaterThan(17600), lessThan(18200)));
+        assertThat(bitmap.getHeight(), allOf(greaterThan(17400), lessThan(18200)));
     }
 }

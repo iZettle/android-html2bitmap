@@ -18,10 +18,12 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-beta02'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta02'
+    implementation 'androidx.annotation:annotation:1.0.2'
+    testImplementation 'androidx.test.ext:junit:1.1.1-alpha01'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1-alpha01'
+    androidTestImplementation 'androidx.test:core:1.1.1-alpha01'
+    androidTestImplementation 'androidx.test:runner:1.1.2-alpha01'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.2-alpha01'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

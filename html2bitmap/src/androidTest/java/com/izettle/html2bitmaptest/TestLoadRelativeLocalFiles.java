@@ -9,6 +9,7 @@ import com.izettle.html2bitmap.R;
 import com.izettle.html2bitmap.content.WebViewContent;
 import com.izettle.html2bitmap.content.WebViewResource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,18 +19,24 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class TestLoadRelativeLocalFiles {
+
+    private Context appContext;
+
+    @Before
+    public void setUp() {
+        appContext = ApplicationProvider.getApplicationContext();
+    }
+
     @Test
     public void testLoadRelativeImage() {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
         Html2Bitmap html2Bitmap = new Html2Bitmap.Builder()
                 .setContext(appContext)
                 .setContent(WebViewContent.html("<html><body><h1>Hello world</h1><img src='faces_200_400.png'></body</html>"))
@@ -47,9 +54,7 @@ public class TestLoadRelativeLocalFiles {
 
     @Test
     public void testLoadRemoteFontFilesFromGoogle() throws IOException {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.remotefonttest);
+        InputStream inputStream = appContext.getResources().openRawResource(R.raw.remotefonttest);
 
         String html = stringFromStream(inputStream);
 
@@ -65,14 +70,12 @@ public class TestLoadRelativeLocalFiles {
 
         assertEquals(3, webViewResources.size());
         assertEquals(Uri.parse("https://fonts.googleapis.com/css?family=Hanalei+Fill"), webViewResources.get(1).getUri());
-        assertEquals(Uri.parse("https://fonts.gstatic.com/s/hanaleifill/v6/fC1mPYtObGbfyQznIaQzPQi8UAjFhFqtag.ttf"), webViewResources.get(2).getUri());
+        assertEquals(Uri.parse("https://fonts.gstatic.com/s/hanaleifill/v7/fC1mPYtObGbfyQznIaQzPQi8UAjFhFqtag.ttf"), webViewResources.get(2).getUri());
     }
 
     @Test
     public void testLoadLocalFontFiles() throws IOException {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.localfonttest);
+        InputStream inputStream = appContext.getResources().openRawResource(R.raw.localfonttest);
 
         String html = stringFromStream(inputStream);
 
