@@ -11,7 +11,7 @@ Height will be calculated using WebView.getContentHeight()
 ### Usage: 
 ```
 dependencies {
-    implementation 'com.izettle:html2bitmap:1.6'
+    implementation 'com.izettle:html2bitmap:1.9'
 }
 ```
 
