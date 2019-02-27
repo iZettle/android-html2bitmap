@@ -7,6 +7,7 @@ import com.izettle.html2bitmap.Html2Bitmap;
 import com.izettle.html2bitmap.R;
 import com.izettle.html2bitmap.content.WebViewContent;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -15,8 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import androidx.test.InstrumentationRegistry;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -27,11 +28,16 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(AndroidJUnit4.class)
 public class TestBitmapCSS {
+    private Context appContext;
+
+    @Before
+    public void setUp() {
+        appContext = ApplicationProvider.getApplicationContext();
+    }
+
     @Test
     public void testBitmap() throws Exception {
-        Context appContext = InstrumentationRegistry.getTargetContext();
-
-        InputStream inputStream = InstrumentationRegistry.getContext().getResources().openRawResource(R.raw.csstest);
+        InputStream inputStream = appContext.getResources().openRawResource(R.raw.csstest);
 
         String html = stringFromStream(inputStream);
 
