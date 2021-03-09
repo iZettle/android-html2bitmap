@@ -209,7 +209,7 @@ class Html2BitmapWebView implements ProgressChangedListener {
 
     private Bitmap screenshot(WebView webView) {
 
-        Bitmap bitmap = Bitmap.createBitmap(webView.getMeasuredWidth(), webView.getMeasuredHeight(), Bitmap.Config.RGB_565);
+        Bitmap bitmap = Bitmap.createBitmap(webView.getMeasuredWidth(), webView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(bitmap);
 
