@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import androidx.annotation.RestrictTo;
 
 public abstract class WebViewContent {
 
 
-    private List<WebViewResource> webViewResources = new ArrayList<>();
+    private final List<WebViewResource> webViewResources = new CopyOnWriteArrayList<>();
     private WeakReference<ProgressChangedListener> doneListenerWeakReference;
 
     /***
