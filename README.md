@@ -1,3 +1,7 @@
+## No Longer Maintained
+
+This project is no longer being maintained and has been archived. Thank you for your support and contributions over the years.
+
 # Generate a bitmap from html on Android
 
 Generates a bitmap of a defined width from html by rendering the content inside an off screen webview. 
